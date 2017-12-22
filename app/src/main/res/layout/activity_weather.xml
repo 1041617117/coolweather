@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     >
+    <!--scaleType="centerCrop"图片按比率扩大-->
+    <ImageView
+        android:id="@+id/bing_pic_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        />
 
     <ScrollView
         android:id="@+id/weather_layout"
@@ -12,15 +19,23 @@
         android:layout_height="match_parent"
         android:overScrollMode="never"
         android:scrollbars="none">
+        <!--fitsSystemWindows处理状态栏问题-->
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <include layout="@layout/title"/>
-            <include layout="@layout/now"/>
-            <include layout="@layout/forecast"/>
-            <include layout="@layout/aqi"/>
-            <include layout="@layout/suggestion"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:fitsSystemWindows="true"
+            >
+
+            <include layout="@layout/title" />
+
+            <include layout="@layout/now" />
+
+            <include layout="@layout/forecast" />
+
+            <include layout="@layout/aqi" />
+
+            <include layout="@layout/suggestion" />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

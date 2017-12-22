@@ -8,11 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.Forecast;
 import com.coolweather.android.gson.Weather;
 import com.coolweather.android.util.HttpUtil;
@@ -33,6 +35,7 @@ public class WeatherActivity extends AppCompatActivity{
             aqiText,pm25Text,comfortText,carWashText,sportText;
     private LinearLayout forecastLayout;
     private ScrollView weatherLayout;
+    private ImageView bingPicImg;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +51,15 @@ public class WeatherActivity extends AppCompatActivity{
         carWashText= (TextView) findViewById(R.id.car_wash_text);
         sportText= (TextView) findViewById(R.id.sport_text);
         forecastLayout= (LinearLayout) findViewById(R.id.forecast_layout);
+        bingPicImg= (ImageView) findViewById(R.id.bing_pic_img);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
+        String bingPic = prefs.getString("bing_pic", null);
+        if(bingPic!=null){
+            Glide.with(this).load(bingPic).into(bingPicImg);
+        }else{
+            loadBingPic();
+        }
         if(weatherString!=null){
             Weather weather = Utility.handleWeatherResponse(weatherString);
             showWeatherInfo(weather);
@@ -59,6 +69,7 @@ public class WeatherActivity extends AppCompatActivity{
             requestWeather(weatherId);
         }
     }
+    //根据天气Id请求城市天气信息
     public void requestWeather(final String weatherId){
         String weatherUrl="http://guolin.tech/api/weather?cityid=" +weatherId+
                 "&key=7d694db61a374c13ae814140b6f7999d";
@@ -90,14 +101,16 @@ public class WeatherActivity extends AppCompatActivity{
             }
         });
     }
+    //处理并展示WEATHER实体类中的数据
     public void showWeatherInfo(Weather weather){
         String cityName=weather.basic.cityName;
-        String updateTime=weather.basic.update.updateTime.split("")[1];
+        String updateTime=weather.basic.update.updateTime.split(" ")[1];
         String degree=weather.now.temperature+"℃";
         String weatherInfo=weather.now.more.info;
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
-        degreeText.setText(weatherInfo);
+        degreeText.setText(degree);
+        weatherInfoText.setText(weatherInfo);
         forecastLayout.removeAllViews();
         for(Forecast forecast : weather.forecastList){
             View view= LayoutInflater.from(this).inflate(R.layout.forecast_item,forecastLayout,false);
@@ -122,6 +135,32 @@ public class WeatherActivity extends AppCompatActivity{
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+    }
+    public void loadBingPic(){
+        String requestBingPic="http://guolin.tech/api/bing_pic";
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+               final  String bingPic=response.body().string();
+                SharedPreferences.Editor editor=PreferenceManager
+                        .getDefaultSharedPreferences(WeatherActivity.this)
+                        .edit();
+                editor.apply();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+                    }
+                });
+
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+        });
+
+
     }
 
 }
