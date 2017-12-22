@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.jakewharton.butterknife'
 android {
     compileSdkVersion 25
     buildToolsVersion "26.0.1"
@@ -41,5 +41,8 @@ dependencies {
     compile 'com.squareup.okio:okio:1.13.0'
     //gson
     compile 'com.google.code.gson:gson:2.8.2'
+    //Butterknife
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
 }
